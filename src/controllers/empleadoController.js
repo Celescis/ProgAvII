@@ -1,86 +1,131 @@
-const empleadoService = require('../services/empleadoService');
 const Empleado = require('../models/empleado');
 
 async function obtenerTodos(req, res) {
   try {
-    const empleados = await empleadoService.obtenerTodos();
+    const empleados = await Empleado.findAll();
     res.status(200).json(empleados);
   } catch (error) {
-    res.status(500).send(error.message);
+    console.error('Error al obtener los empleados:', error);
+    res.status(500).send('Error interno del servidor');
   }
 }
 
 async function agregarEmpleado(req, res) {
-  const { nombre, apellido, edad, genero, departamento, salario, fechaContratacion, direccion, telefono, correoElectronico } = req.body;
+  const { nombre, apellido, edad, genero, departamento, salario, fecha_contratacion, direccion, telefono, correo_electronico } = req.body;
 
-  if (!nombre || !apellido || !edad || !genero || !departamento || !salario || !fechaContratacion || !direccion || !telefono || !correoElectronico) {
+  if (!nombre || !apellido || !edad || !genero || !departamento || !salario || !fecha_contratacion || !direccion || !telefono || !correo_electronico) {
     return res.status(400).send('Todos los campos son obligatorios');
   }
   if (typeof edad !== 'number' || typeof salario !== 'number') {
     return res.status(400).send('Edad y salario deben ser números');
   }
 
-  const nuevoEmpleado = new Empleado(null, nombre, apellido, edad, genero, departamento, salario, fechaContratacion, direccion, telefono, correoElectronico);
-
   try {
-    const message = await empleadoService.agregarEmpleado(nuevoEmpleado);
-    res.status(201).json(message);
+    const nuevoEmpleado = await Empleado.create({ 
+      nombre, 
+      apellido, 
+      edad, 
+      genero, 
+      departamento, 
+      salario, 
+      fecha_contratacion, 
+      direccion, 
+      telefono, 
+      correo_electronico 
+    });
+    res.status(201).json({ message: 'Empleado agregado exitosamente', empleado: nuevoEmpleado });
   } catch (error) {
-    res.status(500).send(error.message);
+    console.error('Error al agregar el empleado:', error);
+    if (error.name === 'SequelizeValidationError') {
+      res.status(400).send('Datos inválidos: ' + error.errors.map(e => e.message).join(', '));
+    } else {
+      res.status(500).send('Error interno del servidor');
+    }
   }
 }
 
 async function eliminarEmpleado(req, res) {
-  const empleadoId = req.params.id;
+  const empleadoId = parseInt(req.params.id, 10);
 
-  if (!empleadoId) {
-    return res.status(400).send('ID del empleado es obligatorio');
+  if (isNaN(empleadoId)) {
+    return res.status(400).send('ID del empleado debe ser un número');
   }
 
   try {
-    const message = await empleadoService.eliminarEmpleado(empleadoId);
-    res.status(200).json(message);
+    const resultado = await Empleado.destroy({ where: { id: empleadoId } });
+    if (resultado === 0) {
+      return res.status(404).send('Empleado no encontrado');
+    }
+    res.status(200).json({ message: 'Empleado eliminado exitosamente' });
   } catch (error) {
-    res.status(500).send(error.message);
+    console.error('Error al eliminar el empleado:', error);
+    res.status(500).send('Error interno del servidor');
   }
 }
 
 async function modificarEmpleado(req, res) {
-  const empleadoId = req.params.id;
-  const { nombre, apellido, edad, genero, departamento, salario, fechaContratacion, direccion, telefono, correoElectronico } = req.body;
+  const empleadoId = parseInt(req.params.id, 10);
+  const { nombre, apellido, edad, genero, departamento, salario, fecha_contratacion, direccion, telefono, correo_electronico } = req.body;
 
-  if (!empleadoId) {
-    return res.status(400).send('ID del empleado es obligatorio');
+  if (isNaN(empleadoId)) {
+    return res.status(400).send('ID del empleado debe ser un número');
   }
-  if (!nombre || !apellido || !edad || !genero || !departamento || !salario || !fechaContratacion || !direccion || !telefono || !correoElectronico) {
+  if (!nombre || !apellido || !edad || !genero || !departamento || !salario || !fecha_contratacion || !direccion || !telefono || !correo_electronico) {
     return res.status(400).send('Todos los campos son obligatorios');
   }
   if (typeof edad !== 'number' || typeof salario !== 'number') {
     return res.status(400).send('Edad y salario deben ser números');
   }
 
-  const empleadoActualizado = new Empleado(empleadoId, nombre, apellido, edad, genero, departamento, salario, fechaContratacion, direccion, telefono, correoElectronico);
-
   try {
-    const message = await empleadoService.modificarEmpleado(empleadoActualizado);
-    res.status(200).json(message);
+    const [resultado] = await Empleado.update({ 
+      nombre, 
+      apellido, 
+      edad, 
+      genero, 
+      departamento, 
+      salario, 
+      fecha_contratacion, 
+      direccion, 
+      telefono, 
+      correo_electronico 
+    }, {
+      where: { id: empleadoId }
+    });
+
+    if (resultado === 0) {
+      return res.status(404).send('Empleado no encontrado');
+    }
+
+    res.status(200).json({ message: 'Empleado modificado exitosamente' });
   } catch (error) {
-    res.status(500).send(error.message);
+    console.error('Error al modificar el empleado:', error);
+    if (error.name === 'SequelizeValidationError') {
+      res.status(400).send('Datos inválidos: ' + error.errors.map(e => e.message).join(', '));
+    } else {
+      res.status(500).send('Error interno del servidor');
+    }
   }
 }
 
 async function obtenerEmpleadoPorId(req, res) {
-  const empleadoId = req.params.id;
+  const empleadoId = parseInt(req.params.id, 10);
 
-  if (!empleadoId) {
-    return res.status(400).send('ID del empleado es obligatorio');
+  if (isNaN(empleadoId)) {
+    return res.status(400).send('ID del empleado debe ser un número');
   }
 
   try {
-    const empleado = await empleadoService.obtenerEmpleadoPorId(empleadoId);
+    const empleado = await Empleado.findByPk(empleadoId);
+
+    if (!empleado) {
+      return res.status(404).send('Empleado no encontrado');
+    }
+
     res.status(200).json(empleado);
   } catch (error) {
-    res.status(500).send(error.message);
+    console.error('Error al obtener el empleado:', error);
+    res.status(500).send('Error interno del servidor');
   }
 }
 

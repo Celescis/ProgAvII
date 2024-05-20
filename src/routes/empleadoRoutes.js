@@ -5,6 +5,9 @@ const empleadoController = require('../controllers/empleadoController');
 // Obtener todos los empleados
 router.get('/empleado/obtenerTodos', empleadoController.obtenerTodos);
 
+// Obtener un empleado por su ID
+router.get('/empleado/obtenerUno/:id', empleadoController.obtenerEmpleadoPorId);
+
 // Agregar un nuevo empleado
 router.post('/empleado/crear', empleadoController.agregarEmpleado);
 

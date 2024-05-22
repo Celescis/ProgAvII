@@ -11,16 +11,16 @@ async function obtenerTodos(req, res) {
 }
 
 async function agregarEmpleado(req, res) {
-  const { nombre, apellido, edad, genero, departamento, salario, fechaContratacion, direccion, telefono, correoElectronico } = req.body;
+  const { nombre, apellido, edad, genero, departamento, salario, fecha_contratacion, direccion, telefono, correo_electronico } = req.body;
 
-  if (!nombre || !apellido || !edad || !genero || !departamento || !salario || !fechaContratacion || !direccion || !telefono || !correoElectronico) {
+  if (!nombre || !apellido || !edad || !genero || !departamento || !salario || !fecha_contratacion || !direccion || !telefono || !correo_electronico) {
     return res.status(400).send('Todos los campos son obligatorios');
   }
   if (typeof edad !== 'number' || typeof salario !== 'number') {
     return res.status(400).send('Edad y salario deben ser números');
   }
 
-  const nuevoEmpleado = new Empleado(null, nombre, apellido, edad, genero, departamento, salario, fechaContratacion, direccion, telefono, correoElectronico);
+  const nuevoEmpleado = new Empleado(null, nombre, apellido, edad, genero, departamento, salario, fecha_contratacion, direccion, telefono, correo_electronico);
 
   try {
     const message = await empleadoService.agregarEmpleado(nuevoEmpleado);
@@ -47,19 +47,19 @@ async function eliminarEmpleado(req, res) {
 
 async function modificarEmpleado(req, res) {
   const empleadoId = req.params.id;
-  const { nombre, apellido, edad, genero, departamento, salario, fechaContratacion, direccion, telefono, correoElectronico } = req.body;
+  const { nombre, apellido, edad, genero, departamento, salario, fecha_contratacion, direccion, telefono, correo_electronico } = req.body;
 
   if (!empleadoId) {
     return res.status(400).send('ID del empleado es obligatorio');
   }
-  if (!nombre || !apellido || !edad || !genero || !departamento || !salario || !fechaContratacion || !direccion || !telefono || !correoElectronico) {
+  if (!nombre || !apellido || !edad || !genero || !departamento || !salario || !fecha_contratacion || !direccion || !telefono || !correo_electronico) {
     return res.status(400).send('Todos los campos son obligatorios');
   }
   if (typeof edad !== 'number' || typeof salario !== 'number') {
     return res.status(400).send('Edad y salario deben ser números');
   }
 
-  const empleadoActualizado = new Empleado(empleadoId, nombre, apellido, edad, genero, departamento, salario, fechaContratacion, direccion, telefono, correoElectronico);
+  const empleadoActualizado = new Empleado(empleadoId, nombre, apellido, edad, genero, departamento, salario, fecha_contratacion, direccion, telefono, correo_electronico);
 
   try {
     const message = await empleadoService.modificarEmpleado(empleadoActualizado);

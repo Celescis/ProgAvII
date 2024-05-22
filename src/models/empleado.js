@@ -1,5 +1,5 @@
 class Empleado {
-    constructor(id, nombre, apellido, edad, genero, departamento, salario, fechaContratacion, direccion, telefono, correoElectronico) {
+    constructor(id, nombre, apellido, edad, genero, departamento, salario, fecha_contratacion, direccion, telefono, correo_electronico) {
         this.id = id;
         this.nombre = nombre;
         this.apellido = apellido;
@@ -7,10 +7,10 @@ class Empleado {
         this.genero = genero;
         this.departamento = departamento;
         this.salario = salario;
-        this.fechaContratacion = fechaContratacion;
+        this.fecha_contratacion = fecha_contratacion;
         this.direccion = direccion;
         this.telefono = telefono;
-        this.correoElectronico = correoElectronico;
+        this.correo_electronico = correo_electronico;
     }
 }
 

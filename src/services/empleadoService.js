@@ -13,6 +13,9 @@ async function obtenerTodos() {
 async function agregarEmpleado(nuevoEmpleado) {
   try {
     const empleadoData = Object.values(nuevoEmpleado).filter(value => value !== null);
+    if (empleadoData.length !== 10) {
+      return { error: 'Datos incompletos para agregar el empleado' };
+    }
     await conn.query('INSERT INTO empleados (nombre, apellido, edad, genero, departamento, salario, fecha_contratacion, direccion, telefono, correo_electronico) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', empleadoData);
     return { message: 'Empleado agregado exitosamente' };
   } catch (error) {
@@ -25,7 +28,7 @@ async function eliminarEmpleado(empleadoId) {
   try {
     const [existingEmpleado] = await conn.query('SELECT 1 FROM empleados WHERE id = ?', [empleadoId]);
     if (existingEmpleado.length === 0) {
-      throw new Error('Empleado no encontrado');
+      return { error: 'Empleado no encontrado' };
     }
 
     await conn.query('DELETE FROM empleados WHERE id = ?', [empleadoId]);
@@ -40,12 +43,12 @@ async function modificarEmpleado(empleadoActualizado) {
   try {
     const empleadoData = Object.values(empleadoActualizado);
     if (empleadoData.length !== 11) {
-      throw new Error('Datos incompletos para la actualización del empleado');
+      return { error: 'Datos incompletos para la actualización del empleado' };
     }
 
     const [existingEmpleado] = await conn.query('SELECT 1 FROM empleados WHERE id = ?', [empleadoActualizado.id]);
     if (existingEmpleado.length === 0) {
-      throw new Error('Empleado no encontrado');
+      return { error: 'Empleado no encontrado' };
     }
 
     const query = `
@@ -67,7 +70,7 @@ async function obtenerEmpleadoPorId(empleadoId) {
   try {
     const [rows] = await conn.query('SELECT * FROM empleados WHERE id = ?', [empleadoId]);
     if (rows.length === 0) {
-      throw new Error('Empleado no encontrado');
+      return { error: 'Empleado no encontrado' };
     }
     return rows[0];
   } catch (error) {

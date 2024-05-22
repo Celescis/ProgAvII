@@ -23,8 +23,11 @@ async function agregarEmpleado(req, res) {
   const nuevoEmpleado = new Empleado(null, nombre, apellido, edad, genero, departamento, salario, fecha_contratacion, direccion, telefono, correo_electronico);
 
   try {
-    const message = await empleadoService.agregarEmpleado(nuevoEmpleado);
-    res.status(201).json(message);
+    const response = await empleadoService.agregarEmpleado(nuevoEmpleado);
+    if (response.error) {
+      return res.status(400).send(response.error);
+    }
+    res.status(201).json(response.message);
   } catch (error) {
     res.status(500).send(error.message);
   }
@@ -38,8 +41,11 @@ async function eliminarEmpleado(req, res) {
   }
 
   try {
-    const message = await empleadoService.eliminarEmpleado(empleadoId);
-    res.status(200).json(message);
+    const response = await empleadoService.eliminarEmpleado(empleadoId);
+    if (response.error) {
+      return res.status(404).send(response.error);
+    }
+    res.status(200).json(response.message);
   } catch (error) {
     res.status(500).send(error.message);
   }
@@ -62,8 +68,11 @@ async function modificarEmpleado(req, res) {
   const empleadoActualizado = new Empleado(empleadoId, nombre, apellido, edad, genero, departamento, salario, fecha_contratacion, direccion, telefono, correo_electronico);
 
   try {
-    const message = await empleadoService.modificarEmpleado(empleadoActualizado);
-    res.status(200).json(message);
+    const response = await empleadoService.modificarEmpleado(empleadoActualizado);
+    if (response.error) {
+      return res.status(404).send(response.error);
+    }
+    res.status(200).json(response.message);
   } catch (error) {
     res.status(500).send(error.message);
   }
@@ -77,8 +86,11 @@ async function obtenerEmpleadoPorId(req, res) {
   }
 
   try {
-    const empleado = await empleadoService.obtenerEmpleadoPorId(empleadoId);
-    res.status(200).json(empleado);
+    const response = await empleadoService.obtenerEmpleadoPorId(empleadoId);
+    if (response.error) {
+      return res.status(404).send(response.error);
+    }
+    res.status(200).json(response);
   } catch (error) {
     res.status(500).send(error.message);
   }

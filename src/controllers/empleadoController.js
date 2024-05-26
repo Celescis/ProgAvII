@@ -1,138 +1,129 @@
 const Empleado = require('../models/empleado');
 
-async function obtenerTodos(req, res) {
-  try {
-    const empleados = await Empleado.findAll();
-    res.status(200).json(empleados);
-  } catch (error) {
-    console.error('Error al obtener los empleados:', error);
-    res.status(500).send('Error interno del servidor');
-  }
-}
-
-async function agregarEmpleado(req, res) {
-  const { nombre, apellido, edad, genero, departamento, salario, fecha_contratacion, direccion, telefono, correo_electronico } = req.body;
-
-  if (!nombre || !apellido || !edad || !genero || !departamento || !salario || !fecha_contratacion || !direccion || !telefono || !correo_electronico) {
-    return res.status(400).send('Todos los campos son obligatorios');
-  }
-  if (typeof edad !== 'number' || typeof salario !== 'number') {
-    return res.status(400).send('Edad y salario deben ser números');
-  }
-
-  try {
-    const nuevoEmpleado = await Empleado.create({ 
-      nombre, 
-      apellido, 
-      edad, 
-      genero, 
-      departamento, 
-      salario, 
-      fecha_contratacion, 
-      direccion, 
-      telefono, 
-      correo_electronico 
-    });
-    res.status(201).json({ message: 'Empleado agregado exitosamente', empleado: nuevoEmpleado });
-  } catch (error) {
-    console.error('Error al agregar el empleado:', error);
-    if (error.name === 'SequelizeValidationError') {
-      res.status(400).send('Datos inválidos: ' + error.errors.map(e => e.message).join(', '));
-    } else {
-      res.status(500).send('Error interno del servidor');
+//Renderizar alta
+async function renderAlta(req, res) {
+    try {
+        return res.render('empleado/crearEmpleado', { modificar: false });
+    } catch (error) {
+        req.flash('error', 'Error interno del servidor');
+        return res.redirect('/empleado/crear');
     }
-  }
 }
 
-async function eliminarEmpleado(req, res) {
-  const empleadoId = parseInt(req.params.id, 10);
+//Renderizar modificacion
+async function renderModificacion(req, res) {
+    try {
+        const empleado = await Empleado.findByPk(req.params.id);
+        if (!empleado) {
+            req.flash('error', 'Empleado no encontrado');
+            return res.redirect('/');
+        }
 
-  if (isNaN(empleadoId)) {
-    return res.status(400).send('ID del empleado debe ser un número');
-  }
-
-  try {
-    const resultado = await Empleado.destroy({ where: { id: empleadoId } });
-    if (resultado === 0) {
-      return res.status(404).send('Empleado no encontrado');
+        empleado.fecha_contratacion = new Date(empleado.fecha_contratacion);
+        return res.render('empleado/crearEmpleado', { modificar: true, empleado });
+    } catch (error) {
+        req.flash('error', 'Error interno del servidor');
+        return res.redirect('/');
     }
-    res.status(200).json({ message: 'Empleado eliminado exitosamente' });
-  } catch (error) {
-    console.error('Error al eliminar el empleado:', error);
-    res.status(500).send('Error interno del servidor');
-  }
 }
 
+//Renderizar listar
+async function renderMostrarTodos(req, res) {
+    try {
+        const empleados = await Empleado.findAll();
+        res.render('empleado/listarEmpleados', { empleados });
+    } catch (error) {
+        console.error('Error al obtener los empleados:', error);
+        req.flash('error', 'Error interno del servidor');
+        res.redirect('/');
+    }
+}
+
+//Alta empleado
+async function crearEmpleado(req, res) {
+    try {
+        const { nombre, apellido, edad, genero, departamento, salario, fecha_contratacion, direccion, telefono, correo_electronico } = req.body;
+
+        const nuevoEmpleado = {
+            nombre,
+            apellido,
+            edad: parseInt(edad, 10),
+            genero,
+            departamento,
+            salario: parseFloat(salario),
+            fecha_contratacion,
+            direccion,
+            telefono,
+            correo_electronico
+        };
+
+        await Empleado.create(nuevoEmpleado);
+        req.flash('success', '¡El empleado se agregó exitosamente!');
+        return res.redirect('/');
+    } catch (error) {
+        console.error('Error al agregar el empleado:', error);
+        req.flash('error', 'Error interno del servidor');
+        return res.redirect('/empleado/crear');
+    }
+}
+
+//Modificar empleado
 async function modificarEmpleado(req, res) {
-  const empleadoId = parseInt(req.params.id, 10);
-  const { nombre, apellido, edad, genero, departamento, salario, fecha_contratacion, direccion, telefono, correo_electronico } = req.body;
+    try {
+        const empleado = await Empleado.findByPk(req.params.id);
+        if (!empleado) {
+            req.flash('error', 'Empleado no encontrado');
+            return res.redirect('/');
+        }
 
-  if (isNaN(empleadoId)) {
-    return res.status(400).send('ID del empleado debe ser un número');
-  }
-  if (!nombre || !apellido || !edad || !genero || !departamento || !salario || !fecha_contratacion || !direccion || !telefono || !correo_electronico) {
-    return res.status(400).send('Todos los campos son obligatorios');
-  }
-  if (typeof edad !== 'number' || typeof salario !== 'number') {
-    return res.status(400).send('Edad y salario deben ser números');
-  }
+        const { nombre, apellido, edad, genero, departamento, salario, fecha_contratacion, direccion, telefono, correo_electronico } = req.body;
+        const empleadoActualizado = {
+            nombre,
+            apellido,
+            edad: parseInt(edad, 10),
+            genero,
+            departamento,
+            salario: parseFloat(salario),
+            fecha_contratacion,
+            direccion,
+            telefono,
+            correo_electronico
+        };
 
-  try {
-    const [resultado] = await Empleado.update({ 
-      nombre, 
-      apellido, 
-      edad, 
-      genero, 
-      departamento, 
-      salario, 
-      fecha_contratacion, 
-      direccion, 
-      telefono, 
-      correo_electronico 
-    }, {
-      where: { id: empleadoId }
-    });
-
-    if (resultado === 0) {
-      return res.status(404).send('Empleado no encontrado');
+        await empleado.update(empleadoActualizado);
+        req.flash('success', '¡El empleado se modificó exitosamente!');
+        return res.redirect('/');
+    } catch (error) {
+        console.error('Error al actualizar el empleado:', error);
+        req.flash('error', 'Error interno del servidor');
+        return res.redirect('/');
     }
-
-    res.status(200).json({ message: 'Empleado modificado exitosamente' });
-  } catch (error) {
-    console.error('Error al modificar el empleado:', error);
-    if (error.name === 'SequelizeValidationError') {
-      res.status(400).send('Datos inválidos: ' + error.errors.map(e => e.message).join(', '));
-    } else {
-      res.status(500).send('Error interno del servidor');
-    }
-  }
 }
 
-async function obtenerEmpleadoPorId(req, res) {
-  const empleadoId = parseInt(req.params.id, 10);
-
-  if (isNaN(empleadoId)) {
-    return res.status(400).send('ID del empleado debe ser un número');
-  }
-
-  try {
-    const empleado = await Empleado.findByPk(empleadoId);
-
-    if (!empleado) {
-      return res.status(404).send('Empleado no encontrado');
+//Eliminar empleado
+async function eliminarEmpleado(req, res) {
+    const id = req.params.id;
+    try {
+        const empleadoExiste = await Empleado.findByPk(id);
+        if (!empleadoExiste) {
+            req.flash('error', 'Empleado no encontrado');
+            return res.redirect('/');
+        }
+        await Empleado.destroy({ where: { id } });
+        req.flash('success', 'Empleado eliminado exitosamente');
+        return res.redirect('/');
+    } catch (error) {
+        console.error('Error al eliminar el empleado:', error);
+        req.flash('error', 'Error interno del servidor');
+        return res.redirect('/');
     }
-
-    res.status(200).json(empleado);
-  } catch (error) {
-    console.error('Error al obtener el empleado:', error);
-    res.status(500).send('Error interno del servidor');
-  }
 }
 
 module.exports = {
-  obtenerTodos,
-  agregarEmpleado,
-  eliminarEmpleado,
-  modificarEmpleado,
-  obtenerEmpleadoPorId
+    renderAlta,
+    renderModificacion,
+    renderMostrarTodos,
+    crearEmpleado,
+    modificarEmpleado,
+    eliminarEmpleado
 };

@@ -2,19 +2,14 @@ const express = require('express');
 const router = express.Router();
 const empleadoController = require('../controllers/empleadoController');
 
-// Obtener todos los empleados
-router.get('/empleado/obtenerTodos', empleadoController.obtenerTodos);
+//Rutas para renderizar alta, modificacion y listar
+router.get('/crear', empleadoController.renderAlta);
+router.get('/editar/:id', empleadoController.renderModificacion);
+router.get('/listar', empleadoController.renderMostrarTodos);
 
-// Obtener un empleado por su ID
-router.get('/empleado/obtenerUno/:id', empleadoController.obtenerEmpleadoPorId);
-
-// Agregar un nuevo empleado
-router.post('/empleado/crear', empleadoController.agregarEmpleado);
-
-// Eliminar un empleado por su ID
-router.delete('/empleado/eliminar/:id', empleadoController.eliminarEmpleado);
-
-// Modificar un empleado por su ID
-router.put('/empleado/modificar/:id', empleadoController.modificarEmpleado);
+//Rutas para funcion de alta, modificar, eliminar
+router.post('/crear', empleadoController.crearEmpleado);
+router.post('/editar/:id', empleadoController.modificarEmpleado);
+router.get('/eliminar/:id', empleadoController.eliminarEmpleado);
 
 module.exports = router;

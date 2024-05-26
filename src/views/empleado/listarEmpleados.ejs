@@ -1,0 +1,45 @@
+<div class="table-responsive">
+  <table class="table table-hover table-bordered text-center">
+      <thead class="thead-dark">
+          <tr>
+              <th>Nombre</th>
+              <th>Apellido</th>
+              <th>Edad</th>
+              <th>Género</th>
+              <th>Departamento</th>
+              <th>Salario</th>
+              <th>Fecha de Contratación</th>
+              <th>Dirección</th>
+              <th>Teléfono</th>
+              <th>Correo Electrónico</th>
+              <th>Acciones</th>
+          </tr>
+      </thead>
+      <tbody>
+          <% if (empleados && empleados.length > 0) { %>
+              <% empleados.forEach(empleado => { %>
+                  <tr>
+                      <td><%= empleado.nombre %></td>
+                      <td><%= empleado.apellido %></td>
+                      <td><%= empleado.edad %></td>
+                      <td><%= empleado.genero %></td>
+                      <td><%= empleado.departamento %></td>
+                      <td><%= empleado.salario %></td>
+                      <td><%= new Date(empleado.fecha_contratacion).toLocaleDateString('es-ES') %></td>
+                      <td><%= empleado.direccion %></td>
+                      <td><%= empleado.telefono %></td>
+                      <td><%= empleado.correo_electronico %></td>
+                      <td>
+                          <a href="/empleado/editar/<%= empleado.id %>" class="btn btn-primary btn-sm">Editar</a>
+                          <a href="/empleado/eliminar/<%= empleado.id %>" class="btn btn-danger btn-sm" onclick="return confirm('¿Está seguro de querer eliminar este empleado?');">Eliminar</a>
+                      </td>
+                  </tr>
+              <% }) %>
+          <% } else { %>
+              <tr>
+                  <td colspan="11" class="text-center">No hay empleados disponibles</td>
+              </tr>
+          <% } %>
+      </tbody>
+  </table>
+</div>

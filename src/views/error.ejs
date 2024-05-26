@@ -1,0 +1,11 @@
+<%- include('partials/header') %>
+
+<main>
+  <h1>Error del Servidor</h1>
+  <p>Ocurrió un error en el servidor. Por favor, intenta nuevamente más tarde.</p>
+  <pre><%= error.stack %></pre>
+  <p><a href="/">Volver al Inicio</a></p>
+</main>
+
+<%- include('partials/flashMessages') %>
+<%- include('partials/footer') %>

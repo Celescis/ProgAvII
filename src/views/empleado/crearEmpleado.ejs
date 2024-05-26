@@ -1,0 +1,53 @@
+<%- include('../partials/header') %>
+
+<main class="container mt-4">
+    <h1><%= modificar ? 'Modificar' : 'Crear' %> Empleado</h1>
+    <form action="<%= modificar ? '/empleado/editar/' + empleado.id : '/empleado/crear' %>" method="POST">
+        <div class="form-group">
+            <label>Nombre:</label>
+            <input type="text" name="nombre" value="<%= modificar ? empleado.nombre : 'John' %>" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label>Apellido:</label>
+            <input type="text" name="apellido" value="<%= modificar ? empleado.apellido : 'Doe' %>" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label>Edad:</label>
+            <input type="number" name="edad" value="<%= modificar ? empleado.edad : 30 %>" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label>Género:</label>
+            <input type="text" name="genero" value="<%= modificar ? empleado.genero : 'Masculino' %>" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label>Departamento:</label>
+            <input type="text" name="departamento" value="<%= modificar ? empleado.departamento : 'Tecnología' %>" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label>Salario:</label>
+            <input type="number" step="0.01" name="salario" value="<%= modificar ? empleado.salario : 50000 %>" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label>Fecha de Contratación:</label>
+            <input type="date" name="fecha_contratacion"
+                   value="<%= modificar && empleado.fecha_contratacion ? empleado.fecha_contratacion.toISOString().split('T')[0] : '2023-01-01' %>"
+                   class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label>Dirección:</label>
+            <input type="text" name="direccion" value="<%= modificar ? empleado.direccion : '123 Main St' %>" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label>Teléfono:</label>
+            <input type="text" name="telefono" value="<%= modificar ? empleado.telefono : '123-456-7890' %>" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label>Correo Electrónico:</label>
+            <input type="email" name="correo_electronico" value="<%= modificar ? empleado.correo_electronico : 'johndoe@example.com' %>" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-success"><%= modificar ? 'Actualizar' : 'Crear' %></button>
+    </form>
+</main>
+
+<%- include('../partials/flashMessages') %>
+<%- include('../partials/footer') %>

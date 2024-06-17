@@ -1,6 +1,6 @@
 const Empleado = require('../models/empleado');
 
-//Renderizar alta
+// Renderizar alta
 async function renderAlta(req, res) {
     try {
         return res.render('empleado/crearEmpleado', { modificar: false });
@@ -10,10 +10,10 @@ async function renderAlta(req, res) {
     }
 }
 
-//Renderizar modificacion
+// Renderizar modificación
 async function renderModificacion(req, res) {
     try {
-        const empleado = await Empleado.findByPk(req.params.id);
+        const empleado = await Empleado.findById(req.params.id);
         if (!empleado) {
             req.flash('error', 'Empleado no encontrado');
             return res.redirect('/');
@@ -27,10 +27,10 @@ async function renderModificacion(req, res) {
     }
 }
 
-//Renderizar listar
+// Renderizar listar
 async function renderMostrarTodos(req, res) {
     try {
-        const empleados = await Empleado.findAll();
+        const empleados = await Empleado.find();
         res.render('empleado/listarEmpleados', { empleados });
     } catch (error) {
         console.error('Error al obtener los empleados:', error);
@@ -39,12 +39,12 @@ async function renderMostrarTodos(req, res) {
     }
 }
 
-//Alta empleado
+// Alta empleado
 async function crearEmpleado(req, res) {
     try {
         const { nombre, apellido, edad, genero, departamento, salario, fecha_contratacion, direccion, telefono, correo_electronico } = req.body;
 
-        const nuevoEmpleado = {
+        const nuevoEmpleado = new Empleado({
             nombre,
             apellido,
             edad: parseInt(edad, 10),
@@ -55,9 +55,9 @@ async function crearEmpleado(req, res) {
             direccion,
             telefono,
             correo_electronico
-        };
+        });
 
-        await Empleado.create(nuevoEmpleado);
+        await nuevoEmpleado.save();
         req.flash('success', '¡El empleado se agregó exitosamente!');
         return res.redirect('/');
     } catch (error) {
@@ -67,10 +67,10 @@ async function crearEmpleado(req, res) {
     }
 }
 
-//Modificar empleado
+// Modificar empleado
 async function modificarEmpleado(req, res) {
     try {
-        const empleado = await Empleado.findByPk(req.params.id);
+        const empleado = await Empleado.findById(req.params.id);
         if (!empleado) {
             req.flash('error', 'Empleado no encontrado');
             return res.redirect('/');
@@ -90,7 +90,7 @@ async function modificarEmpleado(req, res) {
             correo_electronico
         };
 
-        await empleado.update(empleadoActualizado);
+        await Empleado.findByIdAndUpdate(req.params.id, empleadoActualizado);
         req.flash('success', '¡El empleado se modificó exitosamente!');
         return res.redirect('/');
     } catch (error) {
@@ -100,16 +100,16 @@ async function modificarEmpleado(req, res) {
     }
 }
 
-//Eliminar empleado
+// Eliminar empleado
 async function eliminarEmpleado(req, res) {
     const id = req.params.id;
     try {
-        const empleadoExiste = await Empleado.findByPk(id);
+        const empleadoExiste = await Empleado.findById(id);
         if (!empleadoExiste) {
             req.flash('error', 'Empleado no encontrado');
             return res.redirect('/');
         }
-        await Empleado.destroy({ where: { id } });
+        await Empleado.findByIdAndDelete(id);
         req.flash('success', 'Empleado eliminado exitosamente');
         return res.redirect('/');
     } catch (error) {

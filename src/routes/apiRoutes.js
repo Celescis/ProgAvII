@@ -17,6 +17,4 @@ router.delete('/empleado/eliminar/:id', apiController.eliminarEmpleado);
 // Modificar un empleado por su ID
 router.put('/empleado/modificar/:id', apiController.modificarEmpleado);
 
-
-
 module.exports = router;

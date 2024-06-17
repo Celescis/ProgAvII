@@ -1,18 +1,11 @@
-<script src="/js/sweetAlert.js"></script>
-<% if (messages.success && messages.success.length > 0) { %>
-  <% messages.success.forEach(function(message) { %>
-      <script>
-          showSwal('Éxito', '<%= message %>', 'success').then(() => {
-            Window.redirect('/');
-          });
-      </script>
-  <% }); %>
-<% } %>
+<script>
+  <% if (messages.error && messages.error.length > 0) { %>
+    showSwal('Error', '<%= messages.error[0] %>', 'error');
+    toastr.error('<%= messages.error[0] %>');
+  <% } %>
 
-<% if (messages.error && messages.error.length > 0) { %>
-  <% messages.error.forEach(function(message) { %>
-      <script>
-          showSwal('Error', '<%= message %>', 'error');
-      </script>
-  <% }); %>
-<% } %>
+  <% if (messages.success && messages.success.length > 0) { %>
+    showSwal('Éxito', '<%= messages.success[0] %>', 'success');
+    toastr.success('<%= messages.success[0] %>');
+  <% } %>
+</script>

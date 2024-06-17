@@ -1,72 +1,73 @@
-const bcrypt = require('bcryptjs');
+// src/controllers/authController.js
 const User = require('../models/user');
+const bcrypt = require('bcryptjs');
 
-//Renderizar login y buscar en la base de datos
-const loginUser = async (req, res) => {
-  const { username, password } = req.body;
+const authController = {
+  loginUser: async (req, res) => {
+    try {
+      const { username, password } = req.body;
+      const user = await User.findOne({ username });
 
-  try {
-    const user = await User.findOne({ where: { username: username } });
-    if (!user) {
-      req.flash('error', 'Usuario no encontrado');
-      return res.redirect('/auth/login');
+      if (!user) {
+        req.flash('error', 'Usuario no encontrado');
+        res.locals.errorMessage = 'Usuario no encontrado';
+        return res.redirect('/auth/login');
+      }
+
+      const isMatch = await bcrypt.compare(password, user.password);
+
+      if (!isMatch) {
+        req.flash('error', 'Contraseña incorrecta');
+        res.locals.errorMessage = 'Contraseña incorrecta';
+        return res.redirect('/auth/login');
+      }
+
+      req.session.userId = user._id;
+      req.flash('success', 'Login exitoso');
+      res.locals.successMessage = 'Login exitoso';
+      res.redirect('/');
+    } catch (error) {
+      console.error('Error al iniciar sesión:', error);
+      req.flash('error', 'Error interno del servidor');
+      res.locals.errorMessage = 'Error interno del servidor';
+      res.redirect('/auth/login');
     }
+  },
 
-    const validPassword = await bcrypt.compare(password, user.password);
-    if (!validPassword) {
-      req.flash('error', 'Contraseña incorrecta');
-      return res.redirect('/auth/login');
+  registerUser: async (req, res) => {
+    try {
+      const { username, password } = req.body;
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      const newUser = new User({
+        username,
+        password: hashedPassword
+      });
+
+      await newUser.save();
+      req.flash('success', 'Registro exitoso');
+      res.locals.successMessage = 'Registro exitoso';
+      res.redirect('/auth/login');
+    } catch (error) {
+      console.error('Error al registrar usuario:', error);
+      req.flash('error', 'Error interno del servidor');
+      res.locals.errorMessage = 'Error interno del servidor';
+      res.redirect('/auth/register');
     }
+  },
 
-    req.session.userId = user.id;
-    req.flash('success', 'Inicio de sesión exitoso');
-    res.redirect('/');
-  } catch (error) {
-    console.error('Error al autenticar el usuario:', error);
-    req.flash('error', 'Error interno del servidor');
-    res.redirect('/auth/login');
-  }
-};
-
-//Renderizar registro y guardar en la base de datos
-const registerUser = async (req, res) => {
-  const { username, password } = req.body;
-
-  try {
-    const existingUser = await User.findOne({ where: { username: username } });
-    if (existingUser) {
-      req.flash('error', 'El usuario ya existe');
-      return res.redirect('/auth/register');
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = await User.create({
-      username: username,
-      password: hashedPassword,
+  logoutUser: (req, res) => {
+    req.session.destroy(err => {
+      if (err) {
+        console.error('Error al cerrar sesión:', err);
+        req.flash('error', 'Error interno del servidor');
+        res.locals.errorMessage = 'Error interno del servidor';
+        res.redirect('/');
+      } else {
+        res.redirect('/auth/login');
+      }
     });
-
-    req.flash('success', 'Registro exitoso');
-    res.redirect('/auth/login');
-  } catch (error) {
-    console.error('Error al registrar el usuario:', error);
-    req.flash('error', 'Error interno del servidor');
-    res.redirect('/auth/register');
   }
 };
 
-// Cerrar sesión
-const logoutUser = (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      req.flash('error', 'Error al cerrar sesión');
-      return res.redirect('/');
-    }
-    res.redirect('/');
-  });
-};
-
-module.exports = {
-  loginUser,
-  registerUser,
-  logoutUser,
-};
+module.exports = authController;

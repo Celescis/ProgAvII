@@ -1,23 +1,30 @@
+// app.js
 const express = require('express');
 const session = require('express-session');
 const flash = require('express-flash');
 const path = require('path');
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
-const sequelize = require('./src/config/conn');
-const Empleado = require('./src/models/empleado');
+const toastr = require('express-toastr');
 const empleadoRoutes = require('./src/routes/empleadoRoutes');
 const authRoutes = require('./src/routes/authRoutes');
 const userMiddleware = require('./src/middlewares/userMiddleware');
+const connect = require('./src/config/conn');
+const Empleado = require('./src/models/empleado');
+const cookieParser = require('cookie-parser');
+const jwtMiddleware = require('./src/middlewares/jwtMiddleware')
 
+connect(); 
 dotenv.config();
-
 const app = express();
 const PORT = process.env.APP_PORT || 3000;
 
 // Middleware para manejar JSON y formularios
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+// Configurar cookie-parser
+app.use(cookieParser());
 
 // Configurar express-session
 app.use(session({
@@ -30,6 +37,12 @@ app.use(session({
 // Configurar express-flash
 app.use(flash());
 
+// Configurar express-toastr
+app.use(toastr({
+  closeButton: true,
+  progressBar: true,
+  positionClass: 'toast-top-right',
+}));
 // Usar el middleware de usuario
 app.use(userMiddleware);
 
@@ -41,25 +54,19 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'src/views'));
 
 // Rutas
-app.use("/empleado", empleadoRoutes);
+app.use("/empleado",jwtMiddleware, empleadoRoutes);
 app.use("/auth", authRoutes);
 app.get('/', async (req, res) => {
   try {
-    const empleados = await Empleado.findAll();
-    res.render('home', { empleados });
+      const empleados = await Empleado.find();
+      res.render('home', { empleados });
   } catch (error) {
-    console.error('Error al obtener los empleados:', error);
-    res.status(500).send('Error interno del servidor');
+      console.error('Error al obtener los empleados:', error);
+      req.flash('error', 'Error interno del servidor');
+      res.render('home', { empleados: [] });
   }
 });
 
-sequelize.sync()
-  .then(() => {
-    console.log('Conexión a la base de datos establecida');
-    app.listen(PORT, () => {
-      console.log(`Servidor escuchando en el puerto ${PORT}`);
-    });
-  })
-  .catch(err => {
-    console.error('No se pudo conectar a la base de datos:', err);
-  });
+app.listen(PORT, () => {
+  console.log(`Servidor corriendo en el puerto ${PORT}`);
+});

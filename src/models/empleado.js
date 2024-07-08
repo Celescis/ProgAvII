@@ -1,87 +1,61 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/conn');
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-const Empleado = sequelize.define('empleado', {
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true,
-  },
+const EmpleadoSchema = new Schema({
   nombre: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    validate: {
-      notEmpty: true,
-    },
+    type: String,
+    required: true,
+    trim: true
   },
   apellido: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    validate: {
-      notEmpty: true,
-    },
+    type: String,
+    required: true,
+    trim: true
   },
   edad: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    validate: {
-      isInt: true,
-      min: 0,
-    },
+    type: Number,
+    required: true,
+    min: 0
   },
   genero: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    validate: {
-      notEmpty: true,
-    },
+    type: String,
+    required: true,
+    trim: true
   },
   departamento: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    validate: {
-      notEmpty: true,
-    },
+    type: String,
+    required: true,
+    trim: true
   },
   salario: {
-    type: DataTypes.FLOAT,
-    allowNull: false,
-    validate: {
-      isFloat: true,
-      min: 0,
-    },
+    type: Number,
+    required: true,
+    min: 0
   },
   fecha_contratacion: {
-    type: DataTypes.DATE,
-    allowNull: false,
-    validate: {
-      isDate: true,
-    },
+    type: Date,
+    required: true
   },
   direccion: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    validate: {
-      notEmpty: true,
-    },
+    type: String,
+    required: true,
+    trim: true
   },
   telefono: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    validate: {
-      notEmpty: true,
-    },
+    type: String,
+    required: true,
+    trim: true
   },
   correo_electronico: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    validate: {
-      isEmail: true,
-    },
-  },
+    type: String,
+    required: true,
+    trim: true,
+    match: [/^\S+@\S+\.\S+$/, 'Correo electrónico inválido']
+  }
 }, {
-  tableName: 'empleados',
-  timestamps: false,
+  collection: 'empleados',
+  timestamps: false
 });
 
+const Empleado = mongoose.model('Empleado', EmpleadoSchema);
 module.exports = Empleado;

@@ -1,45 +1,119 @@
-<div class="table-responsive">
-  <table class="table table-hover table-bordered text-center">
-      <thead class="thead-dark">
-          <tr>
-              <th>Nombre</th>
-              <th>Apellido</th>
-              <th>Edad</th>
-              <th>Género</th>
-              <th>Departamento</th>
-              <th>Salario</th>
-              <th>Fecha de Contratación</th>
-              <th>Dirección</th>
-              <th>Teléfono</th>
-              <th>Correo Electrónico</th>
-              <th>Acciones</th>
-          </tr>
-      </thead>
-      <tbody>
-          <% if (empleados && empleados.length > 0) { %>
-              <% empleados.forEach(empleado => { %>
-                  <tr>
-                      <td><%= empleado.nombre %></td>
-                      <td><%= empleado.apellido %></td>
-                      <td><%= empleado.edad %></td>
-                      <td><%= empleado.genero %></td>
-                      <td><%= empleado.departamento %></td>
-                      <td><%= empleado.salario %></td>
-                      <td><%= new Date(empleado.fecha_contratacion).toLocaleDateString('es-ES') %></td>
-                      <td><%= empleado.direccion %></td>
-                      <td><%= empleado.telefono %></td>
-                      <td><%= empleado.correo_electronico %></td>
-                      <td>
-                          <a href="/empleado/editar/<%= empleado.id %>" class="btn btn-primary btn-sm">Editar</a>
-                          <a href="/empleado/eliminar/<%= empleado.id %>" class="btn btn-danger btn-sm" onclick="return confirm('¿Está seguro de querer eliminar este empleado?');">Eliminar</a>
-                      </td>
-                  </tr>
-              <% }) %>
-          <% } else { %>
-              <tr>
-                  <td colspan="11" class="text-center">No hay empleados disponibles</td>
-              </tr>
-          <% } %>
-      </tbody>
-  </table>
-</div>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Lista Empleados</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/toastr.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simple-notify@latest/dist/simple-notify.min.css">
+    <script src="/js/toastr.min.js"></script>
+    <script src="/js/sweetAlert.js"></script>
+</head>
+
+<body>
+
+    <div class="table-responsive">
+        <table class="table table-hover table-bordered text-center">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Edad</th>
+                    <th>Género</th>
+                    <th>Departamento</th>
+                    <th>Salario</th>
+                    <th>Fecha de Contratación</th>
+                    <th>Dirección</th>
+                    <th>Teléfono</th>
+                    <th>Correo Electrónico</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (empleados && empleados.length> 0) { %>
+                    <% empleados.forEach(empleado=> { %>
+                        <tr>
+                            <td>
+                                <%= empleado.nombre %>
+                            </td>
+                            <td>
+                                <%= empleado.apellido %>
+                            </td>
+                            <td>
+                                <%= empleado.edad %>
+                            </td>
+                            <td>
+                                <%= empleado.genero %>
+                            </td>
+                            <td>
+                                <%= empleado.departamento %>
+                            </td>
+                            <td>
+                                <%= empleado.salario %>
+                            </td>
+                            <td>
+                                <%= new Date(empleado.fecha_contratacion).toLocaleDateString('es-ES') %>
+                            </td>
+                            <td>
+                                <%= empleado.direccion %>
+                            </td>
+                            <td>
+                                <%= empleado.telefono %>
+                            </td>
+                            <td>
+                                <%= empleado.correo_electronico %>
+                            </td>
+                            <td>
+                                <a href="/empleado/editar/<%= empleado.id %>" class="btn btn-primary btn-sm">Editar</a>
+                                <a href="/empleado/eliminar/<%= empleado.id %>" class="btn btn-danger btn-sm"
+                                    onclick="return confirm('¿Está seguro de querer eliminar este empleado?');">Eliminar</a>
+                            </td>
+                        </tr>
+                        <% }) %>
+                            <% } else { %>
+                                <tr>
+                                    <td colspan="11" class="text-center">No hay empleados disponibles</td>
+                                </tr>
+                                <% } %>
+            </tbody>
+        </table>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/simple-notify@latest/dist/simple-notify.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const message = urlParams.get('message');
+            if (message == "login") {
+                if (message) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Bienvenido!',
+                        text: "Ha ingresado exitosamente",
+                        confirmButtonText: 'OK'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = "/";
+                        }
+                    });
+                }
+            } else if (message == "cierra") {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'HASTA PRONTO!',
+                    text: "Se ha cerrado sesión correctamente",
+                    confirmButtonText: 'OK'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "/auth/login";
+                    }
+                });
+            }
+        });
+    </script>
+</body>

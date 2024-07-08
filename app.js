@@ -11,16 +11,20 @@ const authRoutes = require('./src/routes/authRoutes');
 const userMiddleware = require('./src/middlewares/userMiddleware');
 const connect = require('./src/config/conn');
 const Empleado = require('./src/models/empleado');
+const cookieParser = require('cookie-parser');
+const jwtMiddleware = require('./src/middlewares/jwtMiddleware')
 
 connect(); 
 dotenv.config();
-
 const app = express();
 const PORT = process.env.APP_PORT || 3000;
 
 // Middleware para manejar JSON y formularios
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+// Configurar cookie-parser
+app.use(cookieParser());
 
 // Configurar express-session
 app.use(session({
@@ -50,7 +54,7 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'src/views'));
 
 // Rutas
-app.use("/empleado", empleadoRoutes);
+app.use("/empleado",jwtMiddleware, empleadoRoutes);
 app.use("/auth", authRoutes);
 app.get('/', async (req, res) => {
   try {
